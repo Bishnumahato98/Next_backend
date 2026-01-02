@@ -11,7 +11,8 @@ console.log(process.env.PORT);
 
 import authRoutes from "./route/auth.route"
 import bookRoutes from './route/book.route';
-
+import authUerRoutes from './route/admin/admin.route';
+import adminUserRoute from './route/admin/admin.route';
 const app:Application = express();
 
 // const PORT :number=3003;
@@ -19,6 +20,8 @@ const app:Application = express();
 app.use(bodyParser.json());
 
 app.use('/api/auth', authRoutes);
+app.use('/api/auth/user', authUerRoutes);
+app.use('/api/admin/users', adminUserRoute);
 
 app.get('/',(req:Request, res:Response)=>{
     console.log("hello")

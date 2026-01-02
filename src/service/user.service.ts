@@ -1,7 +1,9 @@
-import { CreateUserDTO } from "../dtos/user.dto";
+import { CreateUserDTO, LoginUserDTO } from "../dtos/user.dto";
 import { UserRepository } from "../reposotories/user.repository";
 import bcryptjs from "bcryptjs"
 import { HttpError } from "../errors/http-error";
+import jwt from "jsonwebtoken";
+import { JWT_SECRET } from "../config";
 
 
 let userRepository=new UserRepository();
@@ -23,4 +25,39 @@ export class UserService{
         return newUser;
     }
 
+    async loginUser(data:LoginUserDTO){
+        const user=await userRepository.getUserByEmail(data.email);
+        if(!user){
+            throw new HttpError(404, "User not found");
+        }
+        const validPassword=await bcryptjs.compare(data.password, user.password);
+        if(!validPassword){
+            throw new HttpError(401, "Invalid credentials");
+        }
+
+        const payload ={
+            id:user._id,
+            email:user.email,
+            username:user.username,
+            firstName:user.firstName,
+            lastName:user.lastName,
+            role:user.role
+        }
+        const token =jwt.sign(payload,JWT_SECRET, {expiresIn:"30d"} );
+        return {token ,user}
+    }
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
